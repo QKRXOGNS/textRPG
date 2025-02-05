@@ -74,6 +74,22 @@ public class Warrior : ICharacter
             Health += equipment.HealthBonus;
         }
     }
+    public void Rest()
+    {
+        int restCost = 500;
+        if (Gold >= restCost)
+        {
+            Gold -= restCost;
+            Health = 100;
+            Console.WriteLine("\n휴식을 취하여 체력을 완전히 회복했습니다!");
+            Console.WriteLine($"남은 골드: {Gold}");
+        }
+        else
+        {
+            Console.WriteLine("\n보유 금액이 부족하여 휴식을 취할 수 없습니다.");
+        }
+    }
+
 }
 
 // 몬스터 클래스
@@ -306,8 +322,9 @@ public class Stage
                 Console.WriteLine("2. 인벤토리");
                 Console.WriteLine("3. 상점");
                 Console.WriteLine("4. 던전");
-                Console.WriteLine("5. 게임 종료");
+                Console.WriteLine("5. 휴식하기");
                 Console.WriteLine("6. 저장하기");
+                Console.WriteLine("7. 게임 종료");
                 Console.Write("선택: ");
                 string choice = Console.ReadLine();
 
@@ -326,16 +343,20 @@ public class Stage
                         EnterDungeon(player, inventory);
                         break;
                     case "5":
-                        Console.WriteLine("게임을 종료합니다.");
-                        return;
+                        player.Rest();
+                        break;
                     case "6":
                         SaveSystem.SaveGame(player, inventory);
                         break;
+                    case "7":
+                        Console.WriteLine("게임을 종료합니다.");
+                        return;
                     default:
                         Console.WriteLine("올바른 번호를 입력하세요.");
                         break;
                 }
             }
+
         }
 
 
