@@ -15,29 +15,39 @@ public interface ICharacter
 public class Warrior : ICharacter
 {
     public string Name { get; }
+    public int Level { get; set; } // 레벨 추가 (set을 private에서 public으로 변경)
     public int Health { get; set; }
     public int AttackPower { get; set; }
     public int Defense { get; set; }
     public int Gold { get; set; }
+    public int DungeonClears { get; set; } // 던전 클리어 횟수 저장
+
 
     // 장착 슬롯
     public IEquipment EquippedWeapon { get; private set; }
     public IEquipment EquippedArmor { get; private set; }
 
+    private int dungeonClears; // 던전 클리어 횟수 추적
+
     public bool IsDead => Health <= 0;
 
     // 장비 보너스를 반영한 공격력과 방어력
-    public int Attack => new Random().Next(10, AttackPower) + (EquippedWeapon?.AttackBonus ?? 0);
-    public int TotalDefense => Defense + (EquippedArmor?.DefenseBonus ?? 0); // 방어력 적용
+    public int Attack => new Random().Next(10, AttackPower) + (int)(Level * 0.5);
+    public int TotalDefense => Defense + (Level * 1);
+
 
     public Warrior(string name)
     {
         Name = name;
+        Level = 1;
         Health = 100;
         AttackPower = 20;
         Defense = 5;
         Gold = 100;
+        DungeonClears = 0;
     }
+
+
 
     public bool TakeDamage(int damage)
     {
@@ -47,18 +57,37 @@ public class Warrior : ICharacter
         Health -= actualDamage;
         Console.WriteLine($"{Name}이(가) {actualDamage}의 데미지를 받았습니다. (방어력 {TotalDefense} 적용)");
 
-        if (Health <= 0) // 체력이 0 이하가 되면
+        if (Health <= 0)
         {
             Console.WriteLine($"{Name}이(가) 쓰러졌습니다. 마을로 돌아갑니다...");
-            Gold = (int)(Gold * 0.8); // 골드 20% 차감
-            Health = 100; // 체력 완전 회복
+            Gold = (int)(Gold * 0.8);
+            Health = 100;
             Console.WriteLine($"마을에서 회복되었습니다. 체력: 100, 남은 골드: {Gold}");
-            return true; // 사망 여부 반환 (전투 종료)
+            return true;
         }
 
-        return false; // 생존 상태 반환
+        return false;
+    }
+    public void ClearDungeon()
+    {
+        DungeonClears++;
+
+        if (DungeonClears >= Level)
+        {
+            LevelUp();
+            DungeonClears = 0;
+        }
     }
 
+    private void LevelUp()
+    {
+        Level++;
+        AttackPower += (int)(0.5 * Level);
+        Defense += 1;
+
+        Console.WriteLine($"축하합니다! {Name}이(가) Lv.{Level}으로 레벨업 했습니다!");
+        Console.WriteLine($"공격력 +0.5 → {AttackPower}, 방어력 +1 → {Defense}");
+    }
 
     public void EquipItem(IEquipment equipment)
     {
@@ -293,14 +322,17 @@ public class Stage
         {
             Console.WriteLine($"{monster.Name}을(를) 처치했습니다! 골드 {monster.GoldReward} 획득!");
             player.Gold += monster.GoldReward;
+
+            // 던전 클리어 처리
+            player.ClearDungeon();
         }
     }
+}
 
 
 
-
-    // 메인 프로그램
-    class Program
+// 메인 프로그램
+class Program
     {
         static void Main()
         {
@@ -381,14 +413,15 @@ public class Stage
         {
             Console.WriteLine("\n==== [내 정보] ====");
             Console.WriteLine($"이름: {player.Name}");
+            Console.WriteLine($"레벨: {player.Level}");
             Console.WriteLine($"체력: {player.Health}/100");
 
             // 장비 효과 반영하여 출력
-            int totalAttack = player.AttackPower + (player.EquippedWeapon?.AttackBonus ?? 0);
-            int totalDefense = player.Defense + (player.EquippedArmor?.DefenseBonus ?? 0);
+            int totalAttack = player.AttackPower + (player.EquippedWeapon?.AttackBonus ?? 0) + (int)(player.Level * 0.5);
+            int totalDefense = player.Defense + (player.EquippedArmor?.DefenseBonus ?? 0) + (player.Level * 1);
 
-            Console.WriteLine($"공격력: {totalAttack} (기본: {player.AttackPower}, 장비 추가: {player.EquippedWeapon?.AttackBonus ?? 0})");
-            Console.WriteLine($"방어력: {totalDefense} (기본: {player.Defense}, 장비 추가: {player.EquippedArmor?.DefenseBonus ?? 0})");
+            Console.WriteLine($"공격력: {totalAttack} (기본: {player.AttackPower}, 레벨 보너스: {player.Level * 0.5})");
+            Console.WriteLine($"방어력: {totalDefense} (기본: {player.Defense}, 레벨 보너스: {player.Level * 1})");
             Console.WriteLine($"골드: {player.Gold}");
         }
 
@@ -596,10 +629,12 @@ public static class SaveSystem
         using (StreamWriter writer = new StreamWriter(SaveFilePath))
         {
             writer.WriteLine(player.Name);
+            writer.WriteLine(player.Level); // 레벨 저장
             writer.WriteLine(player.Health);
             writer.WriteLine(player.AttackPower);
             writer.WriteLine(player.Defense);
             writer.WriteLine(player.Gold);
+            writer.WriteLine(player.DungeonClears); // 던전 클리어 횟수 저장
 
             // 인벤토리 아이템 저장
             foreach (var item in inventory)
@@ -625,17 +660,21 @@ public static class SaveSystem
         using (StreamReader reader = new StreamReader(SaveFilePath))
         {
             string name = reader.ReadLine();
+            int level = int.Parse(reader.ReadLine()); // 레벨 불러오기
             int health = int.Parse(reader.ReadLine());
             int attackPower = int.Parse(reader.ReadLine());
             int defense = int.Parse(reader.ReadLine());
             int gold = int.Parse(reader.ReadLine());
+            int dungeonClears = int.Parse(reader.ReadLine()); // 던전 클리어 횟수 불러오기
 
             player = new Warrior(name)
             {
+                Level = level,
                 Health = health,
                 AttackPower = attackPower,
                 Defense = defense,
-                Gold = gold
+                Gold = gold,
+                DungeonClears = dungeonClears // 던전 클리어 횟수 반영
             };
 
             // 인벤토리 불러오기
@@ -652,6 +691,7 @@ public static class SaveSystem
         return true;
     }
 
+
     // 아이템 이름을 기반으로 객체를 생성하는 메서드
     private static IItem CreateItemByName(string name)
     {
@@ -665,8 +705,5 @@ public static class SaveSystem
             _ => null
         };
     }
-}
-
-
 }
 
