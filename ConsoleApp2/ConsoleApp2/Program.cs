@@ -646,14 +646,14 @@ class Program
         bool isUnderleveled = player.Level < selectedDungeon.RequiredLevel;
         if (isUnderleveled)
         {
-            Console.WriteLine("⚠ 레벨이 부족합니다! 패널티가 적용됩니다!");
+            Console.WriteLine("레벨이 부족합니다! 패널티가 적용됩니다!");
             Console.WriteLine("공격력 30% 감소, 방어력 50% 감소 상태로 입장합니다!");
         }
 
         Monster monster = selectedDungeon.Monster;
         if (monster == null)
         {
-            Console.WriteLine("🚨 몬스터 생성에 실패했습니다.");
+            Console.WriteLine("몬스터 생성에 실패했습니다.");
             return;
         }
 
@@ -666,14 +666,14 @@ class Program
             player.Defense = Math.Max(1, (int)(player.Defense * 0.5));
         }
 
-        Console.WriteLine($"🔥 {selectedDungeon.Name}에 입장하여 {monster.Name}과(와) 전투를 시작합니다!");
+        Console.WriteLine($" {selectedDungeon.Name}에 입장하여 {monster.Name}과(와) 전투를 시작합니다!");
 
         new Stage(player, monster, new List<IItem>()).Start();
 
         if (!player.IsDead)
         {
             player.Gold += selectedDungeon.RewardGold;
-            Console.WriteLine($"🎉 던전을 클리어했습니다! {selectedDungeon.RewardGold}골드를 획득했습니다!");
+            Console.WriteLine($" 던전을 클리어했습니다! {selectedDungeon.RewardGold}골드를 획득했습니다!");
             player.ClearDungeon();
         }
 
@@ -746,7 +746,7 @@ class Program
                 string name = reader.ReadLine();
                 if (string.IsNullOrEmpty(name)) // Null 값 확인
                 {
-                    Console.WriteLine("🚨 저장된 데이터가 잘못되었습니다.");
+                    Console.WriteLine(" 저장된 데이터가 잘못되었습니다.");
                     player = null;
                     return false;
                 }
