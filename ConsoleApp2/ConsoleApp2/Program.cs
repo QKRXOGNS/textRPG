@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
+﻿
 // 캐릭터 인터페이스
 public interface ICharacter
 {
@@ -275,10 +272,31 @@ public class Stage
     {
         static void Main()
         {
-            Console.Write("당신의 캐릭터 이름을 입력하세요: ");
-            string playerName = Console.ReadLine();
-            Warrior player = new Warrior(playerName);
-            List<IItem> inventory = new List<IItem>();
+            Warrior player;
+            List<IItem> inventory;
+
+            // 저장 파일이 존재하는지 확인
+            if (File.Exists("save.txt"))
+            {
+                if (SaveSystem.LoadGame(out player, out inventory))
+                {
+                    Console.WriteLine("\n게임을 불러왔습니다!");
+                }
+                else
+                {
+                    Console.WriteLine("\n저장된 데이터를 불러오는 데 실패했습니다.");
+                    return;
+                }
+            }
+            else
+            {
+                // 저장 파일이 없으면 새 게임 시작
+                Console.Write("당신의 캐릭터 이름을 입력하세요: ");
+                string playerName = Console.ReadLine();
+                player = new Warrior(playerName);
+                inventory = new List<IItem>();
+            }
+
             HashSet<string> purchasedEquipment = new HashSet<string>();
 
             while (true)
@@ -289,6 +307,7 @@ public class Stage
                 Console.WriteLine("3. 상점");
                 Console.WriteLine("4. 던전");
                 Console.WriteLine("5. 게임 종료");
+                Console.WriteLine("6. 저장하기");
                 Console.Write("선택: ");
                 string choice = Console.ReadLine();
 
@@ -309,12 +328,17 @@ public class Stage
                     case "5":
                         Console.WriteLine("게임을 종료합니다.");
                         return;
+                    case "6":
+                        SaveSystem.SaveGame(player, inventory);
+                        break;
                     default:
                         Console.WriteLine("올바른 번호를 입력하세요.");
                         break;
                 }
             }
         }
+
+
 
         static void ShowPlayerInfo(Warrior player)
         {
@@ -427,8 +451,88 @@ public class Stage
             new Stage(player, monster, new List<IItem>()).Start();
         }
     }
+
+public static class SaveSystem
+{
+    private static readonly string SaveFilePath = "save.txt";
+
+    // 게임 저장 메서드
+    public static void SaveGame(Warrior player, List<IItem> inventory)
+    {
+        using (StreamWriter writer = new StreamWriter(SaveFilePath))
+        {
+            writer.WriteLine(player.Name);
+            writer.WriteLine(player.Health);
+            writer.WriteLine(player.AttackPower);
+            writer.WriteLine(player.Defense);
+            writer.WriteLine(player.Gold);
+
+            // 인벤토리 아이템 저장
+            foreach (var item in inventory)
+            {
+                writer.WriteLine(item.Name);
+            }
+        }
+
+        Console.WriteLine("\n게임이 저장되었습니다! (save.txt)");
+    }
+
+    // 게임 불러오기 메서드
+    public static bool LoadGame(out Warrior player, out List<IItem> inventory)
+    {
+        inventory = new List<IItem>();
+
+        if (!File.Exists(SaveFilePath))
+        {
+            player = null;
+            return false;
+        }
+
+        using (StreamReader reader = new StreamReader(SaveFilePath))
+        {
+            string name = reader.ReadLine();
+            int health = int.Parse(reader.ReadLine());
+            int attackPower = int.Parse(reader.ReadLine());
+            int defense = int.Parse(reader.ReadLine());
+            int gold = int.Parse(reader.ReadLine());
+
+            player = new Warrior(name)
+            {
+                Health = health,
+                AttackPower = attackPower,
+                Defense = defense,
+                Gold = gold
+            };
+
+            // 인벤토리 불러오기
+            string itemName;
+            while ((itemName = reader.ReadLine()) != null)
+            {
+                IItem item = CreateItemByName(itemName);
+                if (item != null)
+                    inventory.Add(item);
+            }
+        }
+
+        Console.WriteLine("\n저장된 게임을 불러왔습니다!");
+        return true;
+    }
+
+    // 아이템 이름을 기반으로 객체를 생성하는 메서드
+    private static IItem CreateItemByName(string name)
+    {
+        return name switch
+        {
+            "체력 포션" => new HealthPotion(),
+            "공격력 포션" => new StrengthPotion(),
+            "방어력 포션" => new DefensePotion(),
+            "전사의 검" => new Weapon("전사의 검", 100, 15),
+            "강철 갑옷" => new Armor("강철 갑옷", 150, 20, 10),
+            _ => null
+        };
+    }
 }
 
-//추가해야할것
 
-//피 0되면 사망하고 마을로 대신 풀피에 골드 20% 차감
+}
+

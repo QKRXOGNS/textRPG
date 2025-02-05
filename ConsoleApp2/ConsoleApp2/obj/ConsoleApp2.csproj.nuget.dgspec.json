@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj": {}
+    "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj": {
+    "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj",
+        "projectUniqueName": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj",
         "projectName": "ConsoleApp2",
-        "projectPath": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj",
+        "projectPath": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj",
         "packagesPath": "C:\\Users\\pk\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\obj\\",
+        "outputPath": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

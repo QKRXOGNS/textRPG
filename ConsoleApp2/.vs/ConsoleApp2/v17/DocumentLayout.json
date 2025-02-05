@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\",
+  "WorkspaceRootPath": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EF92B8E9-A2BC-4211-9647-6916B5CA854F}|ConsoleApp2\\ConsoleApp2.csproj|c:\\users\\pk\\source\\repos\\consoleapp2\\consoleapp2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{EF92B8E9-A2BC-4211-9647-6916B5CA854F}|ConsoleApp2\\ConsoleApp2.csproj|c:\\users\\pk\\desktop\\textrpg\\consoleapp2\\consoleapp2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EF92B8E9-A2BC-4211-9647-6916B5CA854F}|ConsoleApp2\\ConsoleApp2.csproj|solutionrelative:consoleapp2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\Program.cs",
               "RelativeDocumentMoniker": "ConsoleApp2\\Program.cs",
-              "ToolTip": "C:\\Users\\pk\\source\\repos\\ConsoleApp2\\ConsoleApp2\\Program.cs",
+              "ToolTip": "C:\\Users\\pk\\Desktop\\textRPG\\ConsoleApp2\\ConsoleApp2\\Program.cs",
               "RelativeToolTip": "ConsoleApp2\\Program.cs",
-              "ViewState": "AgIAAOwAAAAAAAAAAAAUwAwBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-31T00:14:13.825Z",
               "EditorCaption": ""
