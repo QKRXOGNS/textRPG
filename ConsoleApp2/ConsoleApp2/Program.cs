@@ -74,6 +74,22 @@ public class Warrior : ICharacter
             Health += equipment.HealthBonus;
         }
     }
+    //장비 벗기
+    public void UnequipItem(IEquipment equipment)
+    {
+        if (equipment == EquippedWeapon)
+        {
+            EquippedWeapon = null;
+            Console.WriteLine($"무기 {equipment.Name}을(를) 해제했습니다!");
+        }
+        else if (equipment == EquippedArmor)
+        {
+            EquippedArmor = null;
+            Health -= equipment.HealthBonus; // 장비가 추가했던 체력 보너스 제거
+            Console.WriteLine($"방어구 {equipment.Name}을(를) 해제했습니다!");
+        }
+    }
+
     public void Rest()
     {
         int restCost = 500;
@@ -400,23 +416,61 @@ public class Stage
             Console.Write("사용할 아이템 번호 (취소: 0): ");
             if (int.TryParse(Console.ReadLine(), out int itemIndex) && itemIndex > 0 && itemIndex <= inventory.Count)
             {
-                if (inventory[itemIndex - 1] is IEquipment equipment)
+                IItem selectedItem = inventory[itemIndex - 1];
+
+                if (selectedItem is IEquipment equipment)
                 {
-                    player.EquipItem(equipment);
+                    if (equipment == player.EquippedWeapon || equipment == player.EquippedArmor)
+                    {
+                        player.UnequipItem(equipment);
+                    }
+                    else
+                    {
+                        player.EquipItem(equipment);
+                    }
                 }
                 else
                 {
-                    inventory[itemIndex - 1].Use(player);
+                    selectedItem.Use(player);
                     inventory.RemoveAt(itemIndex - 1);
                 }
             }
         }
 
+
         static void OpenShop(Warrior player, List<IItem> inventory, HashSet<string> purchasedEquipment)
         {
-            Console.WriteLine("\n==== [상점] ====");
+            while (true)
+            {
+                Console.WriteLine("\n==== [상점] ====");
+                Console.WriteLine("1. 구매");
+                Console.WriteLine("2. 판매");
+                Console.WriteLine("3. 나가기");
+                Console.Write("선택: ");
+                string shopChoice = Console.ReadLine();
 
-            // 상점에서 판매할 아이템 목록
+                switch (shopChoice)
+                {
+                    case "1":
+                        BuyItem(player, inventory, purchasedEquipment);
+                        break;
+                    case "2":
+                        SellItem(player, inventory);
+                        break;
+                    case "3":
+                        Console.WriteLine("상점을 나갑니다.");
+                        return;
+                    default:
+                        Console.WriteLine("올바른 번호를 입력하세요.");
+                        break;
+                }
+            }
+        }
+
+        //구매기능
+        static void BuyItem(Warrior player, List<IItem> inventory, HashSet<string> purchasedEquipment)
+        {
+            Console.WriteLine("\n==== [구매 가능 아이템] ====");
             List<IItem> shopItems = new List<IItem>
     {
         new HealthPotion(), new StrengthPotion(), new DefensePotion(),
@@ -424,7 +478,6 @@ public class Stage
         new Armor("강철 갑옷", 150, 20, 10)
     };
 
-            // 상점 아이템 목록 출력
             for (int i = 0; i < shopItems.Count; i++)
             {
                 string status = (shopItems[i] is IEquipment && purchasedEquipment.Contains(shopItems[i].Name))
@@ -438,7 +491,6 @@ public class Stage
             {
                 IItem item = shopItems[choice - 1];
 
-                // 장비 아이템인지 확인하고 이미 구매했다면 경고 메시지 출력
                 if (item is IEquipment && purchasedEquipment.Contains(item.Name))
                 {
                     Console.WriteLine("이미 구매한 아이템입니다.");
@@ -449,12 +501,8 @@ public class Stage
                 {
                     player.Gold -= item.Price;
                     inventory.Add(item);
-
-                    // 장비 아이템은 구매 제한
                     if (item is IEquipment)
-                    {
                         purchasedEquipment.Add(item.Name);
-                    }
 
                     Console.WriteLine($"{item.Name}을 구매했습니다!");
                 }
@@ -464,6 +512,71 @@ public class Stage
                 }
             }
         }
+
+        //판매기능 추가
+        static void SellItem(Warrior player, List<IItem> inventory)
+        {
+            if (inventory.Count == 0)
+            {
+                Console.WriteLine("\n인벤토리에 판매할 아이템이 없습니다.");
+                return;
+            }
+
+            while (true)
+            {
+                Console.WriteLine("\n==== [판매할 아이템 선택] ====");
+                for (int i = 0; i < inventory.Count; i++)
+                {
+                    int sellPrice = (int)(inventory[i].Price * 0.7); // 70% 가격
+                    string equipped = "";
+                    if (inventory[i] is IEquipment eq)
+                    {
+                        if (eq == player.EquippedWeapon || eq == player.EquippedArmor)
+                            equipped = " [E]";
+                    }
+                    Console.WriteLine($"{i + 1}. {inventory[i].Name}{equipped} - 판매 가격: {sellPrice}골드");
+                }
+                Console.WriteLine("0. 나가기");
+
+                Console.Write("판매할 아이템 번호를 선택하세요: ");
+                if (int.TryParse(Console.ReadLine(), out int choice))
+                {
+                    if (choice == 0)
+                    {
+                        Console.WriteLine("상점 판매를 취소합니다.");
+                        return;
+                    }
+
+                    if (choice > 0 && choice <= inventory.Count)
+                    {
+                        IItem itemToSell = inventory[choice - 1];
+
+                        if (itemToSell is IEquipment equipment)
+                        {
+                            if (equipment == player.EquippedWeapon || equipment == player.EquippedArmor)
+                            {
+                                player.UnequipItem(equipment);
+                            }
+                        }
+
+                        int sellPrice = (int)(itemToSell.Price * 0.7);
+                        player.Gold += sellPrice;
+                        inventory.RemoveAt(choice - 1);
+
+                        Console.WriteLine($"{itemToSell.Name}을(를) 판매하여 {sellPrice}골드를 획득했습니다!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("올바른 번호를 입력하세요.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("숫자를 입력하세요.");
+                }
+            }
+        }
+
 
         static void EnterDungeon(Warrior player, List<IItem> inventory)
         {
